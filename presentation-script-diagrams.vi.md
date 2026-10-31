@@ -1,14 +1,17 @@
 # Kịch bản thuyết trình SRS BrewBoss — 4 sơ đồ
 
 Thứ tự trình bày: **Organization structure → Context diagram → Use case diagram → Main workflow.**
-Bám theo `SRS_PRM393_G2_Cafe_Shop_Management.docx` bản 19/10/2026 (đã sửa sau review của giảng viên).
+Bám theo `SRS_PRM393_G2_Cafe_Shop_Management.docx` bản 31/10/2026 (đã sửa sau review của giảng viên và review use case theo UML 2.5.1).
 
 | Phần | Hình trong SRS | Thời lượng | Bản rút gọn 8 phút |
 |---|---|---|---|
-| 1. Organization structure | Figure 1-2 (Starbucks), Figure 1-3 (BrewBoss), bảng ánh xạ, bảng bằng chứng | 3–4 phút | 2 phút: bỏ đoạn đọc từng tầng Starbucks, chỉ nói ý "suy ra từ mô tả vị trí" |
-| 2. Context diagram | Figure 1-1 | 3 phút | 1,5 phút: chỉ nói Cashier, Customer, VietQR |
-| 3. Use case diagram | Figure 2-3 → 2-7 (D1–D5), 2-8 → 2-13 (A1–A6) | 5–6 phút | 3 phút: chỉ D1, D3, D4 |
-| 4. Main workflow | Figure 2-1 (một ngày vận hành), Figure 2-2 (state machine) | 3–4 phút | 1,5 phút: chỉ giai đoạn Serve customers |
+| 0. Mở đầu | Bìa SRS | 1 phút | 1 phút |
+| 1. Organization structure | Figure 1-2 (Starbucks), Figure 1-3 (BrewBoss), bảng ánh xạ, bảng bằng chứng | 3 phút | 1 phút 30 giây: bỏ đoạn đọc từng tầng Starbucks, chỉ nói ý "suy ra từ mô tả vị trí" |
+| 2. Context diagram | Figure 1-1 | 2 phút 40 giây | 1 phút 30 giây: chỉ nói Cashier, Customer, VietQR |
+| 3. Use case diagram | Figure 2-3 → 2-8 (A1–A6) | 5 phút | 2 phút 30 giây: chỉ A1, A2, A6 |
+| 4. Main workflow | Figure 2-1 (một ngày vận hành), Figure 2-2 (state machine) | 3 phút | 1 phút 10 giây: chỉ giai đoạn Serve customers |
+| 5. Kết thúc | | 20 giây | 20 giây |
+| **Tổng** | | **15 phút** | **8 phút** |
 
 Quy ước: chữ trong `[ngoặc vuông]` là chỉ dẫn (chỉ hình, chuyển slide), không đọc. Chữ trong ngoặc kép là lời nói. Mỗi phần có Q&A dự phòng; không đọc Q&A khi trình bày.
 
@@ -16,15 +19,21 @@ Chuẩn bị trước buổi: mở file SRS bằng Word, chọn **Yes** khi đư
 
 ---
 
-## 0. Mở đầu (20 giây)
+## 0. Mở đầu (1 phút)
 
 [Chiếu trang bìa SRS]
 
-“Thưa thầy và các bạn, nhóm em trình bày phần yêu cầu của BrewBoss, ứng dụng quản lý quán cà phê trên Flutter và Firebase. Em đi theo bốn sơ đồ: cơ cấu tổ chức của quán, sơ đồ ngữ cảnh, use case theo từng vai trò, và quy trình vận hành chính trong một ngày. Sau review lần trước, cơ cấu tổ chức đã được làm lại theo mô hình cửa hàng của Starbucks và có ghi nguồn, nên em bắt đầu từ đó.”
+“Thưa thầy và các bạn, nhóm em trình bày phần yêu cầu của BrewBoss, ứng dụng quản lý quán cà phê trên Flutter và Firebase.
+
+Trước hết, em nói rõ nhóm tham khảo ai. Về mô hình quán: cơ cấu vai trò tham chiếu mô hình cửa hàng của Starbucks, đối chiếu thêm với tin tuyển dụng của Highlands. Cách phục vụ thì theo mô hình quán ngồi tại bàn, trả tiền sau mà iPOS mô tả, vì Starbucks phục vụ tại quầy và thu tiền trước.
+
+Về ứng dụng: phần tích điểm học từ Starbucks Rewards, chương trình mà trong quý 4 năm tài chính 2025, chi tiêu của thành viên chiếm 58% giá trị thanh toán tại các cửa hàng Starbucks trực tiếp vận hành ở Mỹ; nhưng BrewBoss tích điểm theo số điện thoại, không bắt khách cài app. Phần gọi món bằng QR học từ Sapo QR Order, nơi đơn được xử lý sau khi nhân viên xác nhận. Case có số liệu rõ nhất về QR tại bàn là Centro Restaurant Group ở Mỹ: theo Olo, nhà cung cấp của họ, công suất giờ cao điểm tăng hơn 20%, sai đơn giảm từ 15–20 xuống còn 1–2 đơn mỗi ngày. Các số này do chính doanh nghiệp công bố. Chúng cho thấy cơ chế đang chạy thật, chưa chứng minh BrewBoss sẽ đạt cùng kết quả.
+
+Em đi theo bốn sơ đồ: cơ cấu tổ chức của quán, sơ đồ ngữ cảnh, use case theo từng vai trò, và quy trình vận hành chính trong một ngày. Sau review lần trước, cơ cấu tổ chức đã được làm lại theo mô hình cửa hàng của Starbucks và có ghi nguồn, nên em bắt đầu từ đó.”
 
 ---
 
-## 1. Organization structure (3–4 phút)
+## 1. Organization structure (3 phút)
 
 ### 1.1 Figure 1-2 — mô hình tham chiếu Starbucks
 
@@ -96,7 +105,7 @@ Bảng ánh xạ ngay sau hình tóm tắt: mỗi vai trò Starbucks ứng với
 
 ---
 
-## 2. Context diagram (3 phút)
+## 2. Context diagram (2 phút 40 giây)
 
 [Chiếu Figure 1-1; chỉ hình tròn BrewBoss]
 
@@ -145,93 +154,84 @@ Sơ đồ này chốt phạm vi trao đổi dữ liệu; phần tiếp theo cụ
 
 ---
 
-## 3. Use case diagram (5–6 phút)
+## 3. Use case diagram (5 phút)
 
 ### 3.1 Cách đọc ký hiệu
 
-[Chiếu Figure 2-3 (D1)]
+[Chiếu Figure 2-3 (A1)]
 
-“SRS có 46 use case, chia thành năm nhóm chức năng D1 đến D5 và sáu góc nhìn theo actor A1 đến A6. Hai cách chia mô tả cùng một hệ thống.
+“SRS có 46 use case, vẽ theo sáu góc nhìn actor A1 đến A6, từ Figure 2-3 đến 2-8. Mỗi hình chỉ vẽ use case của một actor và actor cha gần nhất; phần kế thừa nằm ở hình của actor cha.
 
-Hình người là actor, gồm người dùng và dịch vụ hỗ trợ. Oval là use case trong khung BrewBoss. Đường liền không mũi tên là association: actor tham gia chức năng đó. Mũi tên tam giác rỗng là generalization: Cashier, Barista, Shift Supervisor và Manager đều là Staff nên dùng chung chức năng của Staff. Mũi tên nét đứt include đi từ chức năng chính tới chức năng được bao gồm; extend đi từ chức năng mở rộng vào chức năng gốc. Chiều mũi tên không phải thứ tự thực hiện.”
+Hình người là actor, gồm người dùng và dịch vụ hỗ trợ. Oval là use case trong khung BrewBoss; oval xám là use case được lặp lại để đủ ngữ cảnh, mô tả ở hình của actor khác. Đường liền không mũi tên là association. Mũi tên tam giác rỗng là generalization: actor con có mọi quyền của actor cha. Include đi từ chức năng chính tới phần dùng chung; extend đi từ phần mở rộng vào chức năng gốc và có điều kiện. Chiều mũi tên không phải thứ tự thực hiện.”
 
-### 3.2 D1 — Authentication & Staff (Figure 2-3)
+### 3.2 A1 — Staff (Figure 2-3)
 
-[Chỉ bốn tam giác hướng vào Staff]
+[Chỉ chữ Staff in nghiêng]
 
-“Staff là actor trừu tượng; trong app không có role tên Staff. Staff nối với đăng nhập, đăng xuất, đặt lại mật khẩu và vào ra ca. Đăng nhập và đặt lại mật khẩu nối với Firebase Auth.
+“Staff là actor trừu tượng nên tên in nghiêng; trong app không có role tên Staff. Mọi nhân viên đều đăng nhập, đăng xuất, đặt lại mật khẩu, vào ra ca và xem menu. Đăng nhập, đăng xuất và đặt lại mật khẩu nối với Firebase Auth.”
 
-[Chỉ Manager và Shift Supervisor]
+### 3.3 A2 — Cashier (Figure 2-4)
 
-Manager có UC04 quản lý tài khoản và UC06 xem lịch sử ca. UC45 xem báo cáo tiền ca nối với Shift Supervisor, vì theo quy ước nhóm chỉ vẽ vai trò thấp nhất được dùng chức năng; Manager đương nhiên cũng dùng được.
+[Chỉ tam giác Cashier → Staff, rồi UC44 → UC05]
 
-[Chỉ UC05 include UC44]
+“Thu ngân kế thừa Staff. Bàn giao tiền UC44 mở rộng vào ra ca UC05, không phải include, vì pha chế check-out không chạy bước này. Điều kiện nằm ở bảng extend ngay sau các hình use case: người check-out giữ két tiền.
 
-Vào ra ca bao gồm bàn giao tiền; bước này áp dụng cho thu ngân, trưởng ca và quản lý khi kết ca, không áp dụng cho pha chế vì ca pha chế không có phần tiền.”
+[Chỉ cột bên trái]
 
-### 3.3 D2 — Menu & Inventory (Figure 2-4)
+Thu ngân xem sơ đồ bàn, tạo đơn, sửa món, chuyển gộp bàn, đánh dấu đã phục vụ, bật tắt tình trạng món, xác nhận đơn QR, huỷ đơn và thu tiền. Tạo đơn bao gồm xem menu.
 
-“Manager quản lý danh mục, sản phẩm, công thức, nguyên liệu, nhập kho, điều chỉnh, lịch sử kho. UC42 kiểm kho nối với Shift Supervisor, trưởng ca làm được và quản lý cũng làm được. Thu ngân bật tắt tình trạng còn món; Staff và khách đều xem được menu.
+[Chỉ các mũi tên vào UC25]
 
-[Chỉ UC14 → UC08, UC16 → UC13 và UC15, UC43 → UC27]
+Thanh toán luôn bao gồm trừ kho theo công thức. Voucher, gắn khách, đổi điểm, thanh toán kết hợp và phiếu thanh toán là phần mở rộng. VietQR nối vào UC25 và UC46 vì hai chức năng này đều tạo mã chuyển khoản. Riêng voucher có thêm đường trực tiếp từ thu ngân vì còn áp được ngay trong màn sửa đơn. Từ chối đơn QR là UC27 mở rộng UC22. Cảnh báo kho thấp mở rộng trừ kho khi tồn chạm ngưỡng tối thiểu, gửi qua FCM. Thu ngân cũng nhận thông báo món sẵn sàng UC31.”
 
-Công thức mở rộng quản lý sản phẩm. Thanh toán bao gồm trừ kho theo công thức. Cảnh báo kho thấp mở rộng trừ kho và điều chỉnh kho, phát khi tồn chạm ngưỡng tối thiểu, gửi qua FCM. Trừ hao hụt mở rộng huỷ đơn, chỉ khi đồ uống đã được làm.”
+### 3.4 A3 — Barista (Figure 2-5)
 
-### 3.4 D3 — Point of Sale (Figure 2-5)
+“Pha chế xử lý hàng đợi, chuyển đơn pending sang preparing rồi ready; UC30 bao gồm UC31 thông báo món sẵn sàng, gửi qua FCM.”
 
-“Thu ngân xem sơ đồ bàn, tạo đơn, sửa món, xác nhận đơn QR, đánh dấu đã phục vụ, chuyển gộp bàn, huỷ đơn và thu tiền. Tạo đơn bao gồm xem menu. Manager thiết lập bàn, QR và cài đặt quán.
+### 3.5 A4 — Customer (Figure 2-6)
 
-[Chỉ UC27 → UC22 và các extend hướng vào UC25]
+“Khách đặt món qua QR bàn, bao gồm xem menu; Firebase Auth tạo phiên ẩn danh nên khách không cần tài khoản. Theo dõi trạng thái là use case riêng, nối trực tiếp với khách, không extend đặt món: nó chạy sau khi đặt món xong, tiền điều kiện là đơn do phiên ẩn danh của khách tạo, và khách có thể mở lại link bất cứ lúc nào. Đơn QR ở trạng thái awaiting và chỉ tới pha chế sau khi thu ngân xác nhận.”
 
-Huỷ đơn mở rộng xác nhận đơn QR: thu ngân có thể từ chối đơn khách và ghi lý do. Thanh toán có các phần mở rộng voucher, phiếu thanh toán, thanh toán kết hợp tiền mặt và VietQR; VietQR nối vào UC25 để tạo mã chuyển khoản. Điều kiện thanh toán: đơn đã served và người xác nhận đang có ca mở.”
+### 3.6 A5 — Manager (Figure 2-7)
 
-### 3.5 D4 — Barista Display & Customer Ordering (Figure 2-6)
+“Quản lý có các chức năng thiết lập và báo cáo: nhân viên, danh mục, sản phẩm, nguyên liệu, nhập kho, điều chỉnh, lịch sử kho, bàn và QR, cài đặt quán, dashboard, lịch sử đơn, báo cáo, voucher, khách tích điểm. Tạo tài khoản nhân viên nối Firebase Auth. Công thức mở rộng quản lý sản phẩm; xuất báo cáo mở rộng xem báo cáo; phiếu thanh toán mở rộng lịch sử đơn. Quản lý là người nhận cảnh báo kho thấp nên nối trực tiếp với UC16.”
 
-“Pha chế xử lý hàng đợi, chuyển đơn pending sang preparing rồi ready; UC30 bao gồm UC31 thông báo món sẵn sàng qua FCM. Khách đặt món qua QR bàn, bao gồm xem menu; Firebase Auth tạo phiên ẩn danh nên khách không cần tài khoản; theo dõi trạng thái mở rộng đặt món. Đơn QR tạo ra ở trạng thái awaiting và chỉ tới pha chế sau khi thu ngân xác nhận ở D3.”
+### 3.7 A6 — Shift Supervisor (Figure 2-8)
 
-### 3.6 D5 — Reports & Loyalty (Figure 2-7)
-
-“Manager xem dashboard, lịch sử đơn, báo cáo bán hàng, xuất báo cáo, quản lý voucher và khách tích điểm. Xuất báo cáo mở rộng xem báo cáo; phiếu thanh toán mở rộng lịch sử đơn. Với thu ngân, gắn khách theo số điện thoại và đổi điểm đều mở rộng thanh toán: khách có thể trả tiền mà không tích điểm.”
-
-### 3.7 Góc nhìn theo actor A1–A6 (nếu còn thời gian)
-
-[Chiếu nhanh Figure 2-8 đến 2-13]
-
-“A1 Staff gom năm chức năng chung. A2 Cashier là luồng bán hàng từ mở ca tới thanh toán. A3 Barista chỉ có hàng đợi và thông báo. A4 Customer là xem menu, đặt qua QR, theo dõi đơn. A5 Manager là các chức năng thiết lập và báo cáo chỉ quản lý mới có.
-
-[Dừng ở Figure 2-13]
-
-A6 Shift Supervisor là hình mới: ba chức năng trưởng ca được dùng ngoài quyền thu ngân và pha chế. UC45 báo cáo tiền ca và UC42 kiểm kho là của trưởng ca; UC27 huỷ đơn được vẽ lại từ A2 vì trưởng ca là cấp thấp nhất được huỷ đơn đã bắt đầu pha, và huỷ đó có thể kéo theo trừ hao hụt UC43.”
+“Trưởng ca kế thừa cả thu ngân và pha chế, và quản lý kế thừa trưởng ca. Hình này chỉ vẽ phần trưởng ca có thêm: báo cáo tiền ca, kiểm kho, và huỷ đơn đã bắt đầu pha. Khi tick “Đã pha” thì UC43 trừ hao hụt mở rộng UC27; đó là lý do UC43 chỉ nằm trên hình này. Trừ hao hụt làm giảm tồn, kiểm kho cũng có thể làm giảm tồn, nên cả hai đều có thể kích hoạt cảnh báo kho thấp khi tồn chạm ngưỡng tối thiểu.”
 
 ### Q&A phần 3
 
 **1. Include khác extend thế nào?**
-“Dạ, include là hành vi bắt buộc nằm trong chức năng chính, ví dụ thanh toán luôn trừ kho. Extend là hành vi có điều kiện, ví dụ voucher chỉ áp khi có mã; mũi tên extend đi từ phần mở rộng vào chức năng gốc.”
+“Dạ, include là hành vi được chèn vào chức năng chính, thường là phần dùng chung, ví dụ thanh toán luôn trừ kho. Extend là hành vi bổ sung có điều kiện tại một extension point, ví dụ voucher chỉ áp khi có mã. Bảng dưới Figure 2-8 liệt kê từng extend với extension point và điều kiện.”
 
 **2. Staff có phải role thứ năm không?**
-“Dạ không. Role lưu trong users.role chỉ có manager, supervisor, cashier, barista. Staff là actor trừu tượng để gom chức năng chung.”
+“Dạ không. Role lưu trong users.role chỉ có manager, supervisor, cashier, barista. Staff là actor trừu tượng để gom chức năng chung, nên tên in nghiêng theo UML.”
 
 **3. Vì sao UC45 và UC42 nối Shift Supervisor mà không nối Manager?**
-“Dạ, quy ước của nhóm là chỉ vẽ vai trò thấp nhất được dùng chức năng để tránh trùng đường. Manager kế thừa mọi quyền, ghi ở mục 2.3.1 và bảng 3.1.3.”
+“Dạ, mỗi chức năng chỉ vẽ ở vai trò thấp nhất được dùng để tránh trùng đường. Manager kế thừa trưởng ca nên có sẵn, ghi ở mục 2.3.1 và bảng 3.1.3.”
 
 **4. Thu ngân có huỷ được đơn đã pha không?**
-“Dạ không. Thu ngân huỷ awaiting và pending. Preparing, ready và served chỉ trưởng ca hoặc quản lý, theo BR-ORD-05. UC43 trừ hao hụt xuất hiện trong hình của thu ngân vì là hành vi tự động liên quan, không phải quyền của thu ngân.”
+“Dạ không. Thu ngân huỷ awaiting và pending. Preparing, ready và served chỉ trưởng ca hoặc quản lý, theo BR-ORD-05. Vì vậy UC43 trừ hao hụt không xuất hiện trên hình thu ngân.”
 
-**5. UC05 include UC44 có đúng với pha chế không?**
-“Dạ, include này chỉ chạy ở nhánh kết ca của vai trò có tiền. Pha chế check-out không chạy UC44. Nếu cần chính xác tuyệt đối về UML, nhóm có thể tách use case kết ca có tiền; nhóm giữ hình gọn và ghi rõ điều kiện trong mô tả UC05.”
+**5. Vì sao UC44 là extend mà không phải include của UC05?**
+“Dạ, UC05 vẫn trọn vẹn khi không có UC44: pha chế check-out không có phần tiền, BR-STAFF-03. UC44 chỉ thêm vào khi người check-out là thu ngân, trưởng ca hoặc quản lý, đúng nghĩa hành vi bổ sung có điều kiện của extend.”
 
-**6. Vì sao không nối thu ngân thẳng vào voucher, đổi điểm, phiếu thanh toán?**
-“Dạ, các chức năng đó chỉ xảy ra trong ngữ cảnh thanh toán nên nối bằng extend vào UC25 để giảm số đường. Mô tả từng use case vẫn ghi thu ngân là actor.”
+**6. Vì sao không nối thu ngân thẳng vào đổi điểm, gắn khách, phiếu thanh toán?**
+“Dạ, người thực hiện phần mở rộng là actor của chức năng gốc, nên các chức năng đó đi qua UC25. Chỉ chức năng nào còn bắt đầu được ngoài chức năng gốc mới có đường riêng, như voucher trong màn sửa đơn.”
 
 **7. Vì sao khách đặt QR nối Firebase Auth mà không đăng nhập?**
 “Dạ, khách dùng anonymous auth: hệ thống tạo phiên ẩn danh để khách chỉ đọc được đơn của mình, không cần email hay mật khẩu.”
 
-**8. Use case có thể hiện thứ tự tạo đơn, pha, thu tiền không?**
+**8. “System” trong bảng use case có phải actor không?**
+“Dạ không. Actor phải ở ngoài hệ thống, nên hình không vẽ System. Chữ System trong bảng của UC15, UC16, UC31, UC43 nghĩa là hệ thống tự khởi chạy, ghi ở mục 2.2.”
+
+**9. Use case có thể hiện thứ tự tạo đơn, pha, thu tiền không?**
 “Dạ không. Use case mô tả ai dùng chức năng gì và quan hệ giữa chức năng. Thứ tự nằm ở phần quy trình ngay sau đây.”
 
 ---
 
-## 4. Main workflow (3–4 phút)
+## 4. Main workflow (3 phút)
 
 ### 4.1 Figure 2-1 — một ngày vận hành
 
@@ -315,7 +315,7 @@ Cuối cùng, quản lý xem dashboard, báo cáo và bàn giao tiền; trưởn
 |---|---|
 | Nguồn của cơ cấu Starbucks | Mục 1, đoạn “Starbucks does not publish an organization chart”; bảng bằng chứng dưới Figure 1-2; mục 5.5 nguồn [1]–[4]; ảnh chụp ở 5.6 |
 | Vai trò Starbucks ứng với vai trò nào trong app | Bảng ánh xạ ngay sau Figure 1-3 |
-| Trưởng ca được làm gì | Mục 2.2 actor #4; cột Supervisor trong 3.1.3; Figure 2-13 |
+| Trưởng ca được làm gì | Mục 2.2 actor #4; cột Supervisor trong 3.1.3; Figure 2-8 |
 | Ai được huỷ đơn khi nào | BR-ORD-05 trong 5.1; UC27 |
 | Tiền cuối ca tính thế nào | BR-STAFF-03 đến 05; UC44, UC45 |
 | Firebase ở trong hay ngoài hệ thống | Đoạn dưới Figure 1-1 (trong); ghi chú actor ngoài ở 2.3.1 (dịch vụ hỗ trợ) |
@@ -324,7 +324,7 @@ Cuối cùng, quản lý xem dashboard, báo cáo và bàn giao tiền; trưởn
 ## Phụ lục B — Checklist trước khi trình bày
 
 - Mở SRS bằng Word, cập nhật field để mục lục có 5.5 và 5.6.
-- Đánh dấu trang: Figure 1-2, bảng bằng chứng, Figure 1-3, bảng ánh xạ, Figure 1-1, Figure 2-3, 2-5, 2-6, 2-13, Figure 2-1, 2-2.
+- Đánh dấu trang: Figure 1-2, bảng bằng chứng, Figure 1-3, bảng ánh xạ, Figure 1-1, Figure 2-3, 2-4, 2-7, 2-8, Figure 2-1, 2-2.
 - Mở sẵn thư mục `source-evidence` phòng khi được yêu cầu xem trang gốc; nếu có mạng, mở `careers.starbucks.com/discover-opportunities/coffeehouses/` và bấm tab District Manager để chứng minh câu trích.
 - Thuộc ba con số: 46 use case, 4 vai trò nhân viên cộng khách, 10 nguồn trong 5.5.
 - Luyện bản 8 phút trước; chỉ nói đủ 15 phút nếu thầy cho thời gian.

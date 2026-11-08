@@ -1,0 +1,197 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function uid() { return request.auth.uid; }
+    function userPath() { return /databases/$(database)/documents/users/$(request.auth.uid); }
+    function isStaff() { return signedIn() && exists(userPath()) && get(userPath()).data.isActive == true; }
+    function role() { return get(userPath()).data.role; }
+    function isManager() { return isStaff() && role() == 'manager'; }
+    function atLeastSupervisor() { return isStaff() && role() in ['manager', 'supervisor']; }
+    function isCashierUp() { return isStaff() && role() in ['manager', 'supervisor', 'cashier']; }
+    function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+
+    // True only when this same commit moves the order to paid or cancelled, so a
+    // cashier can never change stock, points, vouchers or cash totals directly.
+    function orderSettled(orderId) {
+      let path = /databases/$(database)/documents/orders/$(orderId);
+      let after = getAfter(path).data;
+      return get(path).data.status != after.status && after.status in ['paid', 'cancelled'];
+    }
+
+    match /users/{id} {
+      allow read: if isManager() || (signedIn() && uid() == id);
+      allow create, delete: if isManager();
+      allow update: if isManager()
+        || (signedIn() && uid() == id && changed().hasOnly(['fcmTokens']));
+    }
+
+    match /shiftLocks/{id} {
+      allow read, delete: if isStaff() && uid() == id;
+      allow create: if isStaff() && uid() == id;
+    }
+
+    match /shifts/{shiftId} {
+      allow read: if atLeastSupervisor() || (signedIn() && resource.data.userId == uid());
+      allow create: if isStaff()
+        && request.resource.data.userId == uid()
+        && request.resource.data.checkOut == null
+        && request.resource.data.cashSales == 0
+        && request.resource.data.qrSales == 0
+        && !exists(/databases/$(database)/documents/shiftLocks/$(uid()))
+        && getAfter(/databases/$(database)/documents/shiftLocks/$(uid())).data.shiftId == shiftId;
+      // Cash fields are immutable once checkOut is set (BR-STAFF-05).
+      allow update: if isStaff() && resource.data.userId == uid() && resource.data.checkOut == null
+        && (isCheckOut() || isPaymentTotals(shiftId));
+
+      function isCheckOut() {
+        let d = request.resource.data;
+        return changed().hasOnly(['checkOut', 'closingCash', 'expectedCash', 'cashDiff', 'handoverNote'])
+          && d.checkOut != null
+          && (resource.data.openingCash == null
+            || (d.expectedCash == resource.data.openingCash + resource.data.cashSales
+              && d.cashDiff == d.closingCash - d.expectedCash));
+      }
+      function isPaymentTotals(id) {
+        let d = request.resource.data;
+        let order = getAfter(/databases/$(database)/documents/orders/$(d.lastPaidOrderId)).data;
+        return changed().hasOnly(['cashSales', 'qrSales', 'lastPaidOrderId'])
+          && orderSettled(d.lastPaidOrderId)
+          && order.status == 'paid'
+          && order.shiftId == id
+          && d.cashSales == resource.data.cashSales + order.cashAmount
+          && d.qrSales == resource.data.qrSales + order.qrAmount;
+      }
+    }
+
+    match /categories/{id} {
+      allow read: if signedIn();
+      allow write: if isManager();
+    }
+
+    match /products/{id} {
+      allow read: if signedIn();
+      allow write: if isManager();
+      allow update: if isCashierUp() && changed().hasOnly(['isAvailable']);
+    }
+
+    match /ingredients/{id} {
+      allow read: if isCashierUp();
+      allow write: if isManager();
+      allow update: if (isCashierUp() && changed().hasOnly(['stock', 'lastOrderId'])
+          && orderSettled(request.resource.data.lastOrderId))
+        || (atLeastSupervisor() && changed().hasOnly(['stock', 'lastMovementId'])
+          && existsAfter(/databases/$(database)/documents/ingredients/$(id)/movements/$(request.resource.data.lastMovementId)));
+
+      // Append-only stock log.
+      match /movements/{movementId} {
+        allow read: if isCashierUp();
+        allow create: if isManager()
+          || (atLeastSupervisor() && request.resource.data.type == 'adjust' && request.resource.data.byUserId == uid())
+          || (isCashierUp() && request.resource.data.byUserId == uid()
+            && request.resource.data.type in ['sale', 'adjust']
+            && orderSettled(request.resource.data.orderId));
+      }
+    }
+
+    match /tables/{id} {
+      allow get: if signedIn();
+      allow list: if isStaff();
+      allow write: if isManager();
+      allow update: if isCashierUp() && changed().hasOnly(['currentOrderId']);
+    }
+
+    match /orders/{id} {
+      allow read: if isStaff()
+        || (signedIn() && resource.data.createdBy == uid())
+        || (signedIn() && uid() in resource.data.get('followerUids', []));
+
+      // Staff orders, and customer QR orders limited by SEC-ANON / SEC-CONFIRM.
+      allow create: if (isCashierUp() && request.resource.data.source == 'staff'
+          && request.resource.data.status == 'pending' && request.resource.data.createdBy == uid())
+        || (signedIn() && isCustomerOrder());
+
+      allow update: if isManager()
+        || (isCashierUp() && !(resource.data.status in ['paid', 'cancelled']) && cashierMove())
+        || baristaMove();
+
+      allow delete: if isManager();
+
+      function isCustomerOrder() {
+        let d = request.resource.data;
+        return d.source == 'customer' && d.status == 'awaiting' && d.createdBy == uid()
+          && d.get('shortId', null) == null
+          && d.get('confirmedBy', null) == null
+          && d.get('confirmedAt', null) == null
+          && d.get('paidBy', null) == null
+          && d.discount == 0 && d.cashAmount == 0 && d.qrAmount == 0 && d.pointsRedeemed == 0
+          && d.tableId is string;
+      }
+      function cashierMove() {
+        let from = resource.data.status;
+        let to = request.resource.data.status;
+        return from == to
+          || (from == 'awaiting' && to in ['pending', 'cancelled'])
+          || (from == 'pending' && to == 'cancelled')
+          || (from == 'ready' && to in ['served', 'pending'])
+          || (from == 'served' && to == 'pending')
+          || (from == 'served' && to == 'paid' && validPayment())
+          || (from in ['preparing', 'ready', 'served'] && to == 'cancelled' && (atLeastSupervisor() || isMergeClose()))
+          || (atLeastSupervisor() && isBaristaTransition(from, to));
+      }
+      function validPayment() {
+        let d = request.resource.data;
+        return d.paidBy == uid() && d.cashAmount >= 0 && d.qrAmount >= 0
+          && d.cashAmount + d.qrAmount == d.total
+          && d.shiftId == get(/databases/$(database)/documents/shiftLocks/$(uid())).data.shiftId;
+      }
+      // BR-ORD-05 exception: only the source order of a served merge.
+      function isMergeClose() {
+        return resource.data.status == 'served' && request.resource.data.get('mergedIntoId', null) != null;
+      }
+      function isBaristaTransition(from, to) {
+        return (from == 'pending' && to == 'preparing')
+          || (from == 'preparing' && to == 'ready')
+          || (from == 'ready' && to == 'preparing'); // "Hoàn tác" within 5 seconds (UC30).
+      }
+      function baristaMove() {
+        return isStaff() && role() == 'barista'
+          && changed().hasOnly(['status', 'updatedAt', 'updatedBy'])
+          && request.resource.data.updatedBy == uid()
+          && isBaristaTransition(resource.data.status, request.resource.data.status);
+      }
+    }
+
+    match /customers/{id} {
+      allow read: if isCashierUp();
+      allow create: if isManager()
+        || (isCashierUp() && request.resource.data.points == 0 && request.resource.data.visitCount == 0);
+      allow update, delete: if isManager();
+      allow update: if isCashierUp() && changed().hasOnly(['points', 'visitCount', 'lastOrderId'])
+        && orderSettled(request.resource.data.lastOrderId);
+    }
+
+    match /vouchers/{code} {
+      allow read: if isCashierUp();
+      allow write: if isManager();
+      allow update: if isCashierUp() && changed().hasOnly(['usedCount', 'lastOrderId'])
+        && request.resource.data.usedCount == resource.data.usedCount + 1
+        && orderSettled(request.resource.data.lastOrderId);
+    }
+
+    match /settings/shop {
+      allow read: if isStaff();
+      allow write: if isManager();
+    }
+    match /settings/public {
+      allow read: if signedIn();
+      allow write: if isManager();
+    }
+
+    match /counters/{id} {
+      allow read: if isCashierUp();
+      allow create: if isCashierUp();
+      allow update: if isCashierUp() && request.resource.data.next == resource.data.next + 1;
+    }
+  }
+}

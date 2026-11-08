@@ -1,0 +1,53 @@
+/// Application messages MSG01–MSG44 of SRS 5.3, keyed by their SRS code.
+const appMessages = <String, String>{
+  'MSG01': 'Email hoặc mật khẩu không đúng. Vui lòng thử lại.',
+  'MSG02': 'Thử lại sau ít phút',
+  'MSG03': 'Tài khoản đã bị vô hiệu hóa. Liên hệ quản lý.',
+  'MSG04': 'Tài khoản chưa được cấu hình',
+  'MSG05': 'Bạn chưa check-out ca làm',
+  'MSG06': 'Nếu email tồn tại, liên kết đặt lại mật khẩu đã được gửi',
+  'MSG07': 'Email đã được sử dụng',
+  'MSG08': 'Mã QR không hợp lệ',
+  'MSG09': 'Số tiền không hợp lệ',
+  'MSG10': 'Không có ca làm nào',
+  'MSG11': 'Danh mục còn sản phẩm. Hãy chuyển hoặc xóa sản phẩm trước.',
+  'MSG12': 'Không tìm thấy món',
+  'MSG13': 'Nguyên liệu đang được dùng trong công thức: {products}',
+  'MSG14': 'Vui lòng nhập lý do',
+  'MSG15': 'Tồn kho không thay đổi',
+  'MSG16': 'Sắp hết {name}: còn {stock} {unit}',
+  'MSG17': 'Bàn đang có đơn, không thể xóa',
+  'MSG18': 'Mất kết nối',
+  'MSG19': 'Bàn đã có đơn',
+  'MSG20': 'Đơn đang được pha, chỉ thêm món được',
+  'MSG21': 'Đã thêm vào đơn {shortId}',
+  'MSG22': 'Mã không tồn tại',
+  'MSG23': 'Mã đã hết hạn',
+  'MSG24': 'Mã đã hết lượt',
+  'MSG25': 'Đơn tối thiểu {minOrder}',
+  'MSG26': 'Thanh toán thành công',
+  'MSG27': 'Số tiền chưa đủ',
+  'MSG28': 'Bạn cần vào ca trước khi thanh toán',
+  'MSG29': 'Chưa cấu hình tài khoản ngân hàng',
+  'MSG30': 'Bàn đã có khách',
+  'MSG31': 'Không thể gộp đơn này',
+  'MSG32': 'Vui lòng nhập lý do hủy',
+  'MSG33': 'Chỉ trưởng ca hoặc quản lý được hủy đơn đã bắt đầu pha',
+  'MSG34': 'Đơn {shortId} — {table} đã sẵn sàng',
+  'MSG35': 'Đã gửi đơn — nhân viên sẽ xác nhận',
+  'MSG36': 'Đã gửi món gọi thêm — nhân viên sẽ xác nhận',
+  'MSG37': 'Mã QR không hợp lệ, vui lòng gọi nhân viên',
+  'MSG38': 'Không gửi được đơn, thử lại',
+  'MSG39': 'Đơn đã bị hủy — vui lòng liên hệ nhân viên',
+  'MSG40': 'Vượt quá số điểm cho phép (tối đa {max})',
+  'MSG41': 'Đã điều chỉnh {count} nguyên liệu',
+  'MSG42': 'Số lượng không hợp lệ',
+  'MSG43': 'Vui lòng nhập ghi chú cho khoản chênh lệch',
+  'MSG44': 'Số tiền chuyển khoản không hợp lệ',
+};
+
+String msg(String code, [Map<String, Object> args = const {}]) {
+  var text = appMessages[code] ?? code;
+  args.forEach((key, value) => text = text.replaceAll('{$key}', '$value'));
+  return text;
+}
